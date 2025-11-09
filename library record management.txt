@@ -1,0 +1,26 @@
+from statistics import mode
+
+library_records = {
+    "Alice": ["Book1", "Book3"],
+    "Bob": [],
+    "Charlie": ["Book2", "Book3", "Book3"],
+    "David": ["Book1"],
+    "Eve": ["Book2", "Book2", "Book4"]
+}
+
+total_books = sum(len(books) for books in library_records.values())
+average_borrowed = total_books / len(library_records)
+members_with_no_books = sum(1 for books in library_records.values() if len(books) == 0)
+all_books = [book for books in library_records.values() for book in books]
+book_counts = {}
+for book in all_books:
+    book_counts[book] = book_counts.get(book, 0) + 1
+most_borrowed_book = max(book_counts, key=book_counts.get)
+least_borrowed_book = min(book_counts, key=book_counts.get)
+most_frequent_book = mode(all_books)
+
+print("Average number of books borrowed:", average_borrowed)
+print("Book with highest borrowings:", most_borrowed_book)
+print("Book with lowest borrowings:", least_borrowed_book)
+print("Number of members with 0 borrowings:", members_with_no_books)
+print("Most frequently borrowed book:", most_frequent_book)

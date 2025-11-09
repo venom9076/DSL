@@ -1,0 +1,102 @@
+import math
+
+class Bucket:
+    def __init__(self, depth, size):
+        self.depth = depth
+        self.size = size
+        self.items = {}
+
+    def is_full(self):
+        return len(self.items) >= self.size
+
+class ExtendibleHashTable:
+    def __init__(self, bucket_size):
+        self.global_depth = 1
+        self.bucket_size = bucket_size
+        self.directory = [Bucket(self.global_depth, bucket_size) for _ in range(2)]
+
+    def hash(self, key):
+        return bin(hash(key))[2:].zfill(32)
+
+    def get_index(self, key):
+        return int(self.hash(key)[-self.global_depth:], 2)
+
+    def double_directory(self):
+        self.global_depth += 1
+        self.directory += self.directory.copy()
+
+    def split_bucket(self, index):
+        old_bucket = self.directory[index]
+        old_depth = old_bucket.depth
+        old_bucket.depth += 1
+        new_bucket = Bucket(old_bucket.depth, self.bucket_size)
+
+        pattern = 1 << (self.global_depth - old_bucket.depth)
+        for i in range(len(self.directory)):
+            if self.directory[i] == old_bucket and (i & pattern):
+                self.directory[i] = new_bucket
+
+        for key, value in list(old_bucket.items.items()):
+            new_index = self.get_index(key)
+            if self.directory[new_index] != old_bucket:
+                new_bucket.items[key] = value
+                del old_bucket.items[key]
+
+    def insert(self, key, value):
+        index = self.get_index(key)
+        bucket = self.directory[index]
+
+        if key in bucket.items:
+            bucket.items[key] = value
+            return
+
+        if not bucket.is_full():
+            bucket.items[key] = value
+        else:
+            if bucket.depth == self.global_depth:
+                self.double_directory()
+            self.split_bucket(index)
+            self.insert(key, value)
+
+    def search(self, key):
+        index = self.get_index(key)
+        bucket = self.directory[index]
+        if key in bucket.items:
+            print("Key:", key, "Value:", bucket.items[key])
+        else:
+            print("Key not found")
+
+    def delete(self, key):
+        index = self.get_index(key)
+        bucket = self.directory[index]
+        if key in bucket.items:
+            del bucket.items[key]
+            print("Key deleted")
+        else:
+            print("Key not found")
+
+    def display(self):
+        print("Global Depth:", self.global_depth)
+        for i, bucket in enumerate(self.directory):
+            print("Index:", i, "Depth:", bucket.depth, "Items:", bucket.items)
+
+h = ExtendibleHashTable(2)
+while True:
+    print("\n1.Insert\n2.Search\n3.Delete\n4.Display\n5.Exit")
+    choice = int(input("Enter choice: "))
+    if choice == 1:
+        key = int(input("Enter key: "))
+        value = input("Enter value: ")
+        h.insert(key, value)
+    elif choice == 2:
+        key = int(input("Enter key to search: "))
+        h.search(key)
+    elif choice == 3:
+        key = int(input("Enter key to delete: "))
+        h.delete(key)
+    elif choice == 4:
+        h.display()
+    elif choice == 5:
+        break
+    else:
+        print("Invalid choice")

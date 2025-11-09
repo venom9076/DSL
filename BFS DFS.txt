@@ -1,0 +1,35 @@
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    while queue:
+        node = queue.popleft()
+        if node not in visited:
+            print(node, end=' ')
+            visited.add(node)
+            for neighbor in graph[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+
+def dfs(matrix, visited, node):
+    print(chr(ord('A') + node), end=' ')
+    visited[node] = True
+    for i in range(len(matrix)):
+        if matrix[node][i] == 1 and not visited[i]:
+            dfs(matrix, visited, i)
+
+locations = ['A', 'B', 'C', 'D']
+graph_list = {'A': ['B', 'C'], 'B': ['A', 'D'], 'C': ['A', 'D'], 'D': ['B', 'C']}
+matrix = [
+    [0, 1, 1, 0],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [0, 1, 1, 0]
+]
+
+print("BFS traversal starting from A:")
+bfs(graph_list, 'A')
+print("\nDFS traversal starting from A:")
+visited = [False] * len(matrix)
+dfs(matrix, visited, 0)

@@ -1,0 +1,93 @@
+class Node:
+    def __init__(self, city, population):
+        self.city = city
+        self.population = population
+        self.left = None
+        self.right = None
+
+class CityBST:
+    def __init__(self):
+        self.root = None
+
+    def insert(self, root, city, population):
+        if root is None:
+            return Node(city, population)
+        if city < root.city:
+            root.left = self.insert(root.left, city, population)
+        elif city > root.city:
+            root.right = self.insert(root.right, city, population)
+        else:
+            root.population = population
+        return root
+
+    def search(self, root, city, comparisons=0):
+        if root is None:
+            print("City not found. Comparisons:", comparisons)
+            return None
+        comparisons += 1
+        if city == root.city:
+            print("City found:", root.city, "Population:", root.population, "Comparisons:", comparisons)
+            return root
+        elif city < root.city:
+            return self.search(root.left, city, comparisons)
+        else:
+            return self.search(root.right, city, comparisons)
+
+    def delete(self, root, city):
+        if root is None:
+            return root
+        if city < root.city:
+            root.left = self.delete(root.left, city)
+        elif city > root.city:
+            root.right = self.delete(root.right, city)
+        else:
+            if root.left is None:
+                return root.right
+            elif root.right is None:
+                return root.left
+            temp = self.min_node(root.right)
+            root.city, root.population = temp.city, temp.population
+            root.right = self.delete(root.right, temp.city)
+        return root
+
+    def min_node(self, node):
+        while node.left:
+            node = node.left
+        return node
+
+    def display_ascending(self, root):
+        if root:
+            self.display_ascending(root.left)
+            print(root.city, "-", root.population)
+            self.display_ascending(root.right)
+
+    def display_descending(self, root):
+        if root:
+            self.display_descending(root.right)
+            print(root.city, "-", root.population)
+            self.display_descending(root.left)
+
+tree = CityBST()
+while True:
+    print("\n1.Add City\n2.Delete City\n3.Update Population\n4.Search City\n5.Display Ascending\n6.Display Descending\n7.Exit")
+    ch = int(input("Enter choice: "))
+    if ch == 1:
+        c = input("Enter city name: ")
+        p = int(input("Enter population: "))
+        tree.root = tree.insert(tree.root, c, p)
+    elif ch == 2:
+        c = input("Enter city name to delete: ")
+        tree.root = tree.delete(tree.root, c)
+    elif ch == 3:
+        c = input("Enter city name to update: ")
+        p = int(input("Enter new population: "))
+        tree.root = tree.insert(tree.root, c, p)
+    elif ch == 4:
+        c = input("Enter city name to search: ")
+        tree.search(tree.root, c)
+    elif ch == 5:
+        tree.display_ascending(tree.root)
+    elif ch == 6:
+        tree.display_descending(tree.root)
+    elif ch == 7:
+        break

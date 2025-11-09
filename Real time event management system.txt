@@ -1,0 +1,35 @@
+from collections import deque
+
+class EventSystem:
+    def __init__(self):
+        self.queue = deque()
+
+    def add_event(self, event):
+        self.queue.append(event)
+
+    def process_event(self):
+        if self.queue:
+            print("Processed:", self.queue.popleft())
+        else:
+            print("No events to process.")
+
+    def display_events(self):
+        print("Pending Events:", list(self.queue))
+
+    def cancel_event(self, event):
+        if event in self.queue:
+            self.queue.remove(event)
+            print("Canceled:", event)
+        else:
+            print("Event not found.")
+
+
+e = EventSystem()
+e.add_event("Login")
+e.add_event("File Upload")
+e.add_event("Logout")
+e.display_events()
+e.cancel_event("File Upload")
+e.display_events()
+e.process_event()
+e.display_events()
